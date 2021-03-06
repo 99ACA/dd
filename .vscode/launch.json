@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Task Puller",
+            "type": "python",
+            "request": "launch",
+            "module": "puller",
+            "cwd": "${workspaceRoot}/src",
+            "gevent": true,
+        },
+        {
+            "name": "Client Puller",
+            "type": "python",
+            "request": "launch",
+            "module": "client.send-task",
+            "gevent": true,
+            "cwd": "${workspaceRoot}/src",
+        }
+    ]
+}
