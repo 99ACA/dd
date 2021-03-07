@@ -7,6 +7,10 @@ from config.service import SERVICE_NAME
 app = Celery(
     SERVICE_NAME, 
     broker=BROKER_URL,
+    broker_transport_options={
+        'visibility_timeout': 1, # in sec
+        'max_retries': 5
+    }
 )
 
 app.autodiscover_tasks(["tasks"])

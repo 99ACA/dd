@@ -4,7 +4,14 @@
 
 ### Dockers
 
-- Run redis docker
+- Run RabbitMQ
+
+```
+    docker run --rm --name rabbit -d -p 5672:5672 -p 15672:15672 -e RABBITMQ_NODENAME=rabbit@celery -e RABBITMQ_DEFAULT_USER=rabbit -e RABBITMQ_DEFAULT_PASS=rabbit  rabbitmq:3-management
+
+    # Can add also into docker run: -e RABBITMQ_DEFAULT_VHOST=my_vhost
+    # should also change the config to: BROKER_URL='amqp://rabbit:rabbit@127.0.0.1:5672/my_vhost/'
+```
 
 ### Env
 
