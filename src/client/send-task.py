@@ -1,4 +1,4 @@
-import uuid
+from uuid import uuid4 as uuid
 
 from celery import Celery
 from config.celery import BROKER_URL
@@ -16,7 +16,7 @@ app = Celery(
 
 taskId = app.send_task(
     ignore_result=True,
-    correlation_id=uuid.uuid4().hex,
+    correlation_id=uuid().hex,
     name="msg-echo.task",
     args=["Send args"],
     kwargs={
