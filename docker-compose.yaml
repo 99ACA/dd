@@ -1,0 +1,87 @@
+version: '3'
+services:
+    mysql:
+        image: mysql:5.7
+        container_name: mysql
+        ports:
+            - 3306:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_USER: mysql
+            MYSQL_PASSWORD: mysql
+        volumes:
+            - ~/code/MyInfra/docker-data/mysql/data:/var/lib/mysql
+            - ./mysql:/etc/mysql/conf.d/
+        networks: 
+            - poc-network
+        restart: unless-stopped
+    redis:
+        image: redis:6
+        container_name: redis
+        command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+        ports:
+            - 6379:6379
+        volumes:
+            - ~/code/MyInfra/docker-data/redis/data:/var/lib/redis
+            - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+        environment:
+            - REDIS_REPLICATION_MODE=master
+        networks: 
+            - poc-network
+        restart: unless-stopped
+    rabbit: #'amqp://rabbit:rabbit@rabbit:5700/local'
+        image: rabbitmq:3-management
+        container_name: rabbit
+        # hostname: 'your-name'
+        ports:
+            # - 15672:15672
+            # - 5672:5672
+            - 17000:15672
+            - 5700:5672            
+        # environment:
+            # RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+            # RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-rabbit}
+            # RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-rabbit}
+            # RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST:-local}
+            # RABBITMQ_NODE_PORT: ${RABBITMQ_NODE_PORT}
+        volumes: #Persisting
+            - ~/code/MyInfra/docker-data/rabbitmq/data:/bitnami
+        # healthcheck:
+        #     test: ['CMD', 'rabbitmqctl', 'status']
+        #     interval: 30s
+        #     timeout: 15s
+        #     retries: 3
+        networks: 
+            - poc-network
+        restart: unless-stopped
+    postgres:
+        image: postgres:13
+        container_name: postgres
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER:-postgres}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+            PGDATA: /data/postgres
+        volumes:
+            - ~/code/MyInfra/docker-data/postgres/data:/data/postgres
+        ports:
+            - "5432:5432"        
+        networks: 
+            - poc-network
+        restart: unless-stopped
+    pgadmin:
+        image: dpage/pgadmin4:4
+        container_name: pgadmin
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.org}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+        volumes:
+            - ~/code/MyInfra/docker-data/postgres/pgadmin:/root/.pgadmin
+        ports:
+            - "${PGADMIN_PORT:-5050}:80"
+        networks:
+            - poc-network
+        restart: unless-stopped               
+networks:
+    poc-network:
+        name: poc-network
+        driver: bridge

@@ -44,3 +44,14 @@ Clean Queue
 ```
     celery -A puller purge -Q celery
 ```
+
+
+
+## Run 
+
+
+### Direct mode
+
+Running direct message queue:
+
+- ``` python -m samples.direct.puller ```

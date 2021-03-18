@@ -23,11 +23,44 @@ help:
 
 .SILENT:
 .ONESHELL:
-setup-venv:  # Setup virtualenv & install
-	(test -e  $(VENV_NAME) || ${PYTHON} -m venv ./.venv) && \
-	$(VENV_ACTIVATE) && \
-	pip3 install --upgrade pip && \
-	make install
+run-direct-puller:  # Setup virtualenv & install
+	$(VENV_ACTIVATE) || (echo "No VENV" && exit 1)
+	cd src
+	${PYTHON} -m samples.direct.server-puller
+
+.SILENT:
+.ONESHELL:
+send-direct-task:  # Setup virtualenv & install
+	$(VENV_ACTIVATE) || (echo "No VENV" && exit 1)
+	echo "** Send task to direct queue **"
+	cd src
+	${PYTHON} -m samples.direct.client-send-task
+
+# Topic - event bus
+.SILENT:
+.ONESHELL:
+run-topic-puller: 
+	$(VENV_ACTIVATE) || (echo "No VENV" && exit 1)
+	cd src
+	${PYTHON} -m samples.topic.server-1-puller &
+	${PYTHON} -m samples.topic.server-2-puller &
+
+.SILENT:
+.ONESHELL:
+kill-topic-puller:
+	ps | awk '/python3 -m samples.topic.server/ {print $2}' | uniq | xargs kill -9
+
+
+.SILENT:
+.ONESHELL:
+send-topic-task:  # Setup virtualenv & install
+	$(VENV_ACTIVATE) || (echo "No VENV" && exit 1)
+	echo "** Send task to direct queue **"
+	cd src
+	${PYTHON} -m samples.topic.client-send-task
+
+
+
 
 
 .ONESHELL:

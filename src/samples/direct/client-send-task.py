@@ -2,6 +2,7 @@ from uuid import uuid4 as uuid
 
 from celery import Celery
 from config.celery import BROKER_URL
+from config.service import SERVICE_NAME
 
 app = Celery(
     broker=BROKER_URL,
@@ -14,9 +15,12 @@ app = Celery(
     timezone="UTC"
 )
 
+
+
 taskId = app.send_task(
     ignore_result=True,
     correlation_id=uuid().hex,
+    queue=f'{SERVICE_NAME}-queue',
     name="msg-echo.task",
     args=["Send args"],
     kwargs={

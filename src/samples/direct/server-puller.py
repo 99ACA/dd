@@ -1,5 +1,7 @@
 import celery
 from celery import Celery
+from kombu import Queue
+
 
 from config.celery import BROKER_URL
 from config.service import SERVICE_NAME
@@ -18,8 +20,8 @@ app = Celery(
 )
 
 app.autodiscover_tasks(["tasks"])
+app.conf.task_default_queue = f'{SERVICE_NAME}-queue'
 
-app.conf.task_routes = {'msg-echo.tasks.*': {'queue': f'{SERVICE_NAME}-queue'}}
 
 # Disable Celery log - https://docs.celeryproject.org/en/stable/userguide/tasks.html#logging
 # https://www.distributedpython.com/2018/08/28/celery-logging/
@@ -34,12 +36,11 @@ app.conf.task_routes = {'msg-echo.tasks.*': {'queue': f'{SERVICE_NAME}-queue'}}
 if __name__ == '__main__':
     # https://docs.celeryproject.org/en/stable/reference/celery.worker.html#celery.worker.WorkController.setup_defaults
     worker = app.Worker(
+        hostname=f'{SERVICE_NAME}-host-name', # ! Verify - The workers node name 
         loglevel='INFO', #  ! Verify - it is working
         redirect_stdouts=False, # ?
         hijack_root_logger=False, # ?
         log_color=False, #  ! Verify - it is working
     )
-
-    # print(app.control.inspect().registered())
 
     worker.start()
